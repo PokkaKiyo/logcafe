@@ -2,11 +2,9 @@ import contextlib
 import logging
 import mmap
 import os
-from collections import OrderedDict
 from collections.abc import Callable, Sequence
 from io import BufferedReader
 from pathlib import Path
-from typing import NamedTuple
 
 import watchfiles
 
@@ -30,34 +28,6 @@ class LogFilter(watchfiles.DefaultFilter):
         return os.path.split(path)[1].startswith(self.allowed_prefix) and super().__call__(
             change, path
         )
-
-
-class CacheKey(NamedTuple):
-    inode: int
-    filename: str
-
-
-class CacheValue(NamedTuple):
-    offset: int
-    mtime: int
-
-
-class WatchLRUCache:
-    __slots__ = ("cache", "maxsize")
-
-    def __init__(self, maxsize: int = 10) -> None:
-        self.cache: OrderedDict[CacheKey, CacheValue] = OrderedDict()
-        self.maxsize = maxsize
-
-    def get(self, key: CacheKey) -> CacheValue | None:
-        return self.cache.get(key)
-
-    def put(self, key: CacheKey, value: CacheValue) -> None:
-        logging.info(f"Setting {key=} to {value=}")
-        self.cache[key] = value
-        self.cache.move_to_end(key)
-        if len(self.cache) > self.maxsize:
-            self.cache.popitem(last=False)
 
 
 async def watch_log_change(  # noqa: C901
