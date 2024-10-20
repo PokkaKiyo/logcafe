@@ -1,0 +1,11 @@
+[watch.service]
+tab_title = "Service Log"
+directory = "logs/"
+log_prefix = "app1.log"
+level_field = 1
+
+[watch.agent]
+tab_title = "Agent Log"
+directory = "logs/"
+log_prefix = "app2.log"
+level_field = 1
